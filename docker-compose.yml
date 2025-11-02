@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:8-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  api:
+    build: ./api
+    container_name: api
+    depends_on:
+      - redis
+    ports:
+      - "3000:3000"
+
+  fluentd:
+    build: ./fluentd
+    container_name: fluentd
+    depends_on:
+      - redis
+      - api
+    volumes:
+      - ./data:/data
+
+  simulator:
+    build: ./simulator
+    container_name: psimulator
+    volumes:
+      - ./data:/data
+
+volumes:
+  redis_data:
